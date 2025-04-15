@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main] # Run when pushed to main branch
+  pull_request:
+    branches: [main] # Run on pull request to main branch
+  workflow_dispatch: # Allow manual start of workflow
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Select an operating system
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Cloning a repository
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Build with Maven
+        run: mvn clean install -DskipTests
+
+      - name: Run unit tests with Maven
+        run: mvn test
+
+      - name: Verify script execution
+        run: |
+          echo "Build and tests completed successfully."
+
+      - name: Update project code in repository
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          echo "$(date) - CI Workflow executed" >> build_log.txt
+          git add build_log.txt
+          git commit -m "Add build log from CI"
+          git push origin HEAD:${GITHUB_REF##*/}
