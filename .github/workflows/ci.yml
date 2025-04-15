@@ -39,3 +39,5 @@ jobs:
           git add build_log.txt
           git commit -m "Add build log from CI"
           git push origin HEAD:${GITHUB_REF##*/}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
